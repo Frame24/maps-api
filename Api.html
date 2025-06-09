@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Яндекс.Карты с API — примеры</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                background: #fafafa;
+            }
+            .api-input {
+                margin-bottom: 1em;
+            }
+            .api-input input {
+                width: 300px;
+                padding: 5px;
+            }
+            .example {
+                background: #fff;
+                padding: 15px;
+                margin-bottom: 2em;
+                border: 1px solid #ddd;
+            }
+            .example h2 {
+                margin-top: 0;
+            }
+            .example .map {
+                width: 100%;
+                height: 300px;
+                border: 1px solid #ccc;
+                margin: 10px 0;
+            }
+            .note {
+                font-size: 0.9em;
+                color: #555;
+            }
+            pre {
+                background: #f4f4f4;
+                padding: 10px;
+                overflow-x: auto;
+            }
+            code {
+                font-family: Consolas, monospace;
+                color: #c7254e;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Примеры работы с Яндекс.Картами с использованием API</h1>
+        <p>
+            В этом документе представлены примеры использования различных возможностей JavaScript
+            API Яндекс.Карт. Для работы примеров необходимо получить API-ключ и вставить его в поле
+            ниже.
+        </p>
+
+        <div class="api-input">
+            <label
+                >API-ключ:
+                <input type="password" id="apiKey" placeholder="Вставьте ваш API-ключ" />
+            </label>
+            <button id="saveApiKey">Сохранить в кэше</button>
+            <p>
+                Как получить API-ключ?
+                <a href="https://developer.tech.yandex.ru/services/" target="_blank">
+                    Перейдите на портал разработчика Яндекса и зарегистрируйте JavaScript API </a
+                >.
+            </p>
+            <p class="note">Ключ хранится в localStorage — не нужно вставлять каждый раз.</p>
+        </div>
+
+        <!-- 1. Инициализация карты -->
+        <div class="example">
+            <h3>1. Инициализация карты</h3>
+            <div id="map1" class="map"></div>
+            <pre><code>const map1 = new ymaps.Map('map1', {
+  center: [55.7558, 37.6176],
+  zoom: 10,
+  type: 'yandex#map',
+  controls: ['zoomControl','fullscreenControl']
+});</code></pre>
+        </div>
+
+        <!-- 2. Placemark -->
+        <div class="example">
+            <h3>2. Добавление метки (Placemark)</h3>
+            <div id="map2" class="map"></div>
+            <pre><code>const map2 = new ymaps.Map('map2', { center: [55.76, 37.64], zoom: 10 });
+const placemark = new ymaps.Placemark([55.76, 37.64], {
+  balloonContent: 'Тут я нахожусь'
+}, {
+  preset: 'islands#violetIcon'
+});
+map2.geoObjects.add(placemark);</code></pre>
+        </div>
+
+        <!-- 3. Кластеры -->
+        <div class="example">
+            <h3>3. Кластеры</h3>
+            <div id="map3" class="map"></div>
+            <pre><code>const map3 = new ymaps.Map('map3', { center: [55.8, 37.6], zoom: 9 });
+const clusterer = new ymaps.Clusterer();
+clusterer.add([
+  new ymaps.Placemark([55.8, 37.5]),
+  new ymaps.Placemark([55.9, 37.6])
+]);
+map3.geoObjects.add(clusterer);</code></pre>
+        </div>
+
+        <!-- 4. Маршрут (MultiRoute) -->
+        <div class="example">
+            <h3>4. Построение маршрута (MultiRoute)</h3>
+            <div id="map4" class="map"></div>
+            <pre><code>const map4 = new ymaps.Map('map4', { center: [55.75, 37.62], zoom: 10 });
+const multiRoute = new ymaps.multiRouter.MultiRoute({
+  referencePoints: ['Москва, Лубянка', 'Москва, Арбат'],
+  params: { routingMode: 'auto' }
+}, { boundsAutoApply: true });
+map4.geoObjects.add(multiRoute);</code></pre>
+        </div>
+
+        <!-- 5. Геокодирование -->
+        <div class="example">
+            <h3>5. Геокодирование (адрес → координаты)</h3>
+            <div id="map5" class="map"></div>
+            <pre><code>const map5 = new ymaps.Map('map5', { center: [55.75, 37.62], zoom: 10 });
+ymaps.geocode('Пушкинская площадь, Москва').then(res => {
+  const coord = res.geoObjects.get(0).geometry.getCoordinates();
+  map5.geoObjects.add(new ymaps.Placemark(coord, {
+    balloonContent: 'Результат геокодирования'
+  }));
+});</code></pre>
+        </div>
+
+        <!-- 6. Геолокация -->
+        <div class="example">
+            <h3>6. Геолокация пользователя</h3>
+            <div id="map6" class="map"></div>
+            <pre><code>const map6 = new ymaps.Map('map6', { center: [55.75, 37.62], zoom: 10 });
+ymaps.geolocation.get({ provider: 'browser', mapStateAutoApply: true })
+  .then(res => map6.geoObjects.add(res.geoObjects));</code></pre>
+        </div>
+
+        <!-- 7. Обработка кликов -->
+        <div class="example">
+            <h3>7. Обработка кликов по карте</h3>
+            <div id="map7" class="map"></div>
+            <pre><code>const map7 = new ymaps.Map('map7', { center: [55.75, 37.62], zoom: 10 });
+map7.events.add('click', e => {
+  alert('Клик в координатах: ' + e.get('coords'));
+});</code></pre>
+        </div>
+
+        <!-- 8. Пользовательский контрол -->
+        <div class="example">
+            <h3>8. Пользовательский контрол</h3>
+            <div id="map8" class="map"></div>
+            <pre><code>const map8 = new ymaps.Map('map8', { center: [55.75, 37.62], zoom: 10 });
+function MyControl() {}
+MyControl.prototype = {
+  onAdd: function () {
+    this._container = ymaps.templateLayoutFactory
+      .createClass('<button>Нажми меня</button>')();
+    this._container.addEventListener('click', () => alert('Контрол сработал'));
+    return this._container;
+  },
+  onRemove: function () {
+    this._container.remove();
+  }
+};
+map8.controls.add(new MyControl(), { float: 'right' });</code></pre>
+        </div>
+
+        <!-- 9. Собственный тайловый слой -->
+        <div class="example">
+            <h3>9. Собственный тайловый слой</h3>
+            <div id="map9" class="map"></div>
+            <pre><code>const map9 = new ymaps.Map('map9', { center: [55.75, 37.62], zoom: 10 });
+const customLayer = new ymaps.Layer('https://tile.openstreetmap.org/{z}/{x}/{y}.png');
+map9.layers.add('custom#tiles', customLayer);
+map9.setType('custom#tiles');</code></pre>
+        </div>
+
+        <!-- 10. Тепловая карта (Heatmap) -->
+        <div class="example">
+            <h3>10. Heatmap (тепловая карта)</h3>
+            <div id="map10" class="map"></div>
+            <pre><code>const map10 = new ymaps.Map('map10', { center: [55.75, 37.62], zoom: 10 });
+const heatmap = new ymaps.Heatmap([
+  [55.75, 37.8, 0.5],
+  [55.70, 37.5, 0.3]
+], { radius: 20 });
+map10.geoObjects.add(heatmap);</code></pre>
+        </div>
+
+        <!-- 11. Панорамы -->
+        <div class="example">
+            <h3>11. Панорамы улиц</h3>
+            <div id="panor11" class="map"></div>
+            <pre><code>ymaps.panorama.locate([55.76, 37.64]).then(panors => {
+  if (panors.length) {
+    new ymaps.panorama.Player('panor11', panors[0]);
+  }
+});</code></pre>
+        </div>
+
+        <!-- 12. SuggestView -->
+        <div class="example">
+            <h3>12. Автодополнение адреса (SuggestView)</h3>
+            <input
+                id="address-input"
+                placeholder="Начните вводить адрес"
+                style="width: 100%; padding: 5px"
+            />
+            <pre><code>new ymaps.SuggestView('address-input')
+  .events.add('select', e => {
+    alert('Выбран адрес: ' + e.get('item').value);
+  });</code></pre>
+        </div>
+
+        <!-- 13. Drawing Tools -->
+        <div class="example">
+            <h3>13. Инструменты рисования (DrawTools)</h3>
+            <div id="map12" class="map"></div>
+            <pre><code>const map12 = new ymaps.Map('map12', { center: [55.75, 37.62], zoom: 10 });
+const drawTools = new ymaps.control.DrawTools();
+map12.controls.add(drawTools);
+drawTools.events.add('drawfinish', e => {
+  map12.geoObjects.add(e.get('target'));
+});</code></pre>
+        </div>
+
+        <script>
+            (function () {
+                const input = document.getElementById('apiKey');
+                const saved = localStorage.getItem('yandexApiKey');
+                if (saved) {
+                    input.value = saved;
+                    loadYandexApi(saved);
+                }
+                document.getElementById('saveApiKey').addEventListener('click', () => {
+                    const key = input.value.trim();
+                    if (!key) return alert('Введите API-ключ');
+                    localStorage.setItem('yandexApiKey', key);
+                    loadYandexApi(key);
+                });
+                function loadYandexApi(key) {
+                    if (document.getElementById('yandexApiScript')) return;
+                    const s = document.createElement('script');
+                    s.id = 'yandexApiScript';
+                    s.src = `https://api-maps.yandex.ru/2.1/?apikey=${key}&lang=ru_RU`;
+                    s.onload = () => ymaps.ready(initAll);
+                    document.head.appendChild(s);
+                }
+            })();
+
+            function initAll() {
+                // 1. Инициализация
+                const map1 = new ymaps.Map('map1', {
+                    center: [55.7558, 37.6176],
+                    zoom: 10,
+                    type: 'yandex#map',
+                    controls: ['zoomControl', 'fullscreenControl'],
+                });
+
+                // 2. Placemark
+                const map2 = new ymaps.Map('map2', { center: [55.76, 37.64], zoom: 10 });
+                const placemark = new ymaps.Placemark(
+                    [55.76, 37.64],
+                    {
+                        balloonContent: 'Тут я нахожусь',
+                    },
+                    {
+                        preset: 'islands#violetIcon',
+                    }
+                );
+                map2.geoObjects.add(placemark);
+
+                // 3. Clusterer
+                const map3 = new ymaps.Map('map3', { center: [55.8, 37.6], zoom: 9 });
+                const clusterer = new ymaps.Clusterer();
+                clusterer.add([
+                    new ymaps.Placemark([55.8, 37.5]),
+                    new ymaps.Placemark([55.9, 37.6]),
+                ]);
+                map3.geoObjects.add(clusterer);
+
+                // 4. MultiRoute
+                const map4 = new ymaps.Map('map4', { center: [55.75, 37.62], zoom: 10 });
+                const multiRoute = new ymaps.multiRouter.MultiRoute(
+                    {
+                        referencePoints: ['Москва, Лубянка', 'Москва, Арбат'],
+                        params: { routingMode: 'auto' },
+                    },
+                    { boundsAutoApply: true }
+                );
+                map4.geoObjects.add(multiRoute);
+
+                // 5. Geocode
+                const map5 = new ymaps.Map('map5', { center: [55.75, 37.62], zoom: 10 });
+                ymaps.geocode('Пушкинская площадь, Москва').then((res) => {
+                    const coord = res.geoObjects.get(0).geometry.getCoordinates();
+                    map5.geoObjects.add(
+                        new ymaps.Placemark(coord, {
+                            balloonContent: 'Результат геокодирования',
+                        })
+                    );
+                });
+
+                // 6. Geolocation
+                const map6 = new ymaps.Map('map6', { center: [55.75, 37.62], zoom: 10 });
+                ymaps.geolocation
+                    .get({ provider: 'browser', mapStateAutoApply: true })
+                    .then((res) => map6.geoObjects.add(res.geoObjects));
+
+                // 7. Click events
+                const map7 = new ymaps.Map('map7', { center: [55.75, 37.62], zoom: 10 });
+                map7.events.add('click', (e) => {
+                    alert('Клик в координатах: ' + e.get('coords'));
+                });
+
+                // 8. Кнопка через ymaps.control.Button
+                const map8 = new ymaps.Map('map8', { center: [55.75, 37.62], zoom: 10 });
+
+                const myButton = new ymaps.control.Button({
+                    data: { content: 'Нажми меня' },
+                    options: { float: 'right' },
+                });
+
+                // обработчик нажатия
+                myButton.events.add('press', () => {
+                    alert('Контрол сработал');
+                });
+
+                // добавить кнопку на карту
+                map8.controls.add(myButton);
+
+                // 9. Custom tiles
+                const map9 = new ymaps.Map('map9', { center: [55.75, 37.62], zoom: 10 });
+                const customLayer = new ymaps.Layer(
+                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+                );
+                map9.layers.add('custom#tiles', customLayer);
+                map9.setType('custom#tiles');
+
+                // 10. Heatmap
+                const map10 = new ymaps.Map('map10', { center: [55.75, 37.62], zoom: 10 });
+                const heatmap = new ymaps.Heatmap(
+                    [
+                        [55.75, 37.8, 0.5],
+                        [55.7, 37.5, 0.3],
+                    ],
+                    { radius: 20 }
+                );
+                map10.geoObjects.add(heatmap);
+
+                // 11. Panorama
+                ymaps.panorama.locate([55.76, 37.64]).then((panors) => {
+                    if (panors.length) {
+                        new ymaps.panorama.Player('panor11', panors[0]);
+                    }
+                });
+
+                // 12. SuggestView
+                new ymaps.SuggestView('address-input').events.add('select', (e) => {
+                    alert('Выбран адрес: ' + e.get('item').value);
+                });
+
+                // 13. DrawTools
+                const map12 = new ymaps.Map('map12', { center: [55.75, 37.62], zoom: 10 });
+                const drawTools = new ymaps.control.DrawTools();
+                map12.controls.add(drawTools);
+                drawTools.events.add('drawfinish', (e) => {
+                    map12.geoObjects.add(e.get('target'));
+                });
+            }
+        </script>
+
+        <h2>Итоги</h2>
+        <ul>
+            <li>Примеры выше демонстрируют возможности JavaScript API Яндекс.Карт.</li>
+            <li>
+                Для полноценной работы с картами, включая динамическое изменение, добавление
+                интерактивных элементов и использование расширенных функций, необходимо использовать
+                API-ключ.
+            </li>
+        </ul>
+    </body>
+</html>

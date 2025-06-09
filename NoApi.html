@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Отчет: Возможности Яндекс.Карт без API</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      line-height: 1.5;
+      background: #fafafa;
+    }
+    h1, h2, h3 {
+      color: #333;
+      margin-top: 1.5em;
+    }
+    ul {
+      margin: 0.5em 0 1em 1.5em;
+    }
+    .example {
+      border: 1px solid #ddd;
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 2em;
+    }
+    .example iframe {
+      display: block;
+      margin: 10px 0;
+      width: 80%;
+      height: 800px;
+      border: 1px solid #ccc;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 10px;
+      overflow-x: auto;
+    }
+    code {
+      font-family: Consolas, monospace;
+      color: #c7254e;
+    }
+    .note {
+      font-size: 0.9em;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Отчет: Что можно сделать с Яндекс.Картой без API</h1>
+
+  <p>Этот документ демонстрирует максимально возможный набор функций, доступных при встраивании карты через <code>&lt;iframe&gt;</code> без получения API-ключа и без использования JavaScript API.</p>
+
+  <h2>1. Возможности без API (iframe)</h2>
+  <ul>
+    <li>Задать <b>центр</b> карты (координаты).</li>
+    <li>Задать <b>масштаб</b> (zoom).</li>
+    <li>Выбрать <b>тип слоя</b>: схема, спутник, гибрид.</li>
+    <li>Отобразить одну или несколько <b>меток</b> через Конструктор карт.</li>
+    <li>Показать <b>маршрут</b> A→B (или цепочку точек) через Конструктор карт.</li>
+    <li>Встроить <b>панораму</b> улицы как отдельный виджет.</li>
+    <li>Изменять атрибуты <code>width/height</code> iframe через CSS/HTML.</li>
+    <li>Динамически менять <code>iframe.src</code> из собственного JavaScript (не API Яндекс.Карт).</li>
+  </ul>
+
+  <p class="note">❗ Без API НЕВОЗМОЖНО: реагировать на клики, добавлять метки программно, получать геолокацию пользователя, слушать события, менять стиль контролов.</p>
+
+  <h2>2. Примеры реализации</h2>
+
+  <div class="example">
+    <h3>2.1. Базовая карта (центр, масштаб, тип «схема»)</h3>
+    <!-- ДЕМОНСТРАЦИЯ -->
+    <iframe
+      src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&z=10&l=map"
+      allowfullscreen>
+    </iframe>
+    <!-- КОД ПРИМЕРА -->
+    <pre><code>&lt;iframe
+  src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&amp;z=10&amp;l=map"
+  width="80%" height="800" frameborder="0"&gt;&lt;/iframe&gt;</code></pre>
+  </div>
+
+  <div class="example">
+    <h3>2.2. Спутник и гибрид</h3>
+    <!-- Спутник -->
+    <iframe
+      src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&z=12&l=sat"
+      allowfullscreen>
+    </iframe>
+    <!-- Гибрид -->
+    <iframe
+      src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&z=12&l=sat%2Cskl"
+      allowfullscreen>
+    </iframe>
+    <pre><code>&lt;!-- Спутник --&gt;
+&lt;iframe src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&amp;z=12&amp;l=sat" width="80%" height="800"&gt;&lt;/iframe&gt;
+
+&lt;!-- Гибрид --&gt;
+&lt;iframe src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&amp;z=12&amp;l=sat%2Cskl" width="80%" height="800"&gt;&lt;/iframe&gt;</code></pre>
+  </div>
+
+  <div class="example">
+    <h3>2.3. Бизнес-объект из Яндекс.Бизнес</h3>
+    <iframe
+      src="https://yandex.ru/map-widget/v1/?ol=biz&oid=119584964261&z=16"
+      allowfullscreen>
+    </iframe>
+    <pre><code>&lt;iframe
+  src="https://yandex.ru/map-widget/v1/?ol=biz&amp;oid=119584964261&amp;z=16"
+  width="80%" height="800"&gt;&lt;/iframe&gt;</code></pre>
+    <p class="note">Замените <code>oid=119584964261</code> на ID вашей организации.</p>
+  </div>
+
+  <div class="example">
+    <h3>2.4. Произвольные точки и маршруты через Map Constructor</h3>
+    <iframe
+      src="https://yandex.ru/map-widget/v1/?um=constructor%3A746b8337d2fb5b9a7edbd933bbae882f5deb21cea83b1efa9523ef0b0c395ea2&amp;source=constructor"
+      allowfullscreen>
+    </iframe>
+    <pre><code>&lt;iframe
+  src="https://yandex.ru/map-widget/v1/?um=constructor%3A&lt;ВАШ_ID&gt;&amp;source=constructor"
+  width="80%" height="800"&gt;&lt;/iframe&gt;</code></pre>
+    <p class="note">Как получить &mdash; через <a href="https://yandex.ru/map-constructor" target="_blank">Map Constructor</a>.</p>
+  </div>
+
+  <div class="example">
+    <h3>2.5. Динамическое изменение карты (JS без API)</h3>
+    <!-- Тут пользователь сам вводит, и мы меняем iframe.src -->
+    Центр (lat,lon): <input id="center" value="58.047597, 38.844779">
+    Масштаб: <input id="zoom" type="number" value="10" style="width:50px">
+    Тип:
+    <select id="layer">
+      <option value="map">Схема</option>
+      <option value="sat">Спутник</option>
+      <option value="sat,skl">Гибрид</option>
+    </select>
+    <button onclick="update()">Обновить карту</button>
+
+    <iframe id="dynFrame" width="80%" height="800" frameborder="0"></iframe>
+
+    <pre><code>&lt;script&gt;
+function update() {
+  const [lat,lon] = document.getElementById('center').value.split(',');
+  const z = document.getElementById('zoom').value;
+  const l = document.getElementById('layer').value;
+  document.getElementById('dynFrame').src =
+    `https://yandex.ru/map-widget/v1/?ll=${lon}%2C${lat}&z=${z}&l=${l}`;
+}
+update();
+&lt;/script&gt;</code></pre>
+  </div>
+
+  <script>
+    function update() {
+      const [lat,lon] = document.getElementById('center').value.split(',');
+      const z = document.getElementById('zoom').value;
+      const l = document.getElementById('layer').value;
+      document.getElementById('dynFrame').src =
+        `https://yandex.ru/map-widget/v1/?ll=${lon}%2C${lat}&z=${z}&l=${l}`;
+    }
+    update();
+    </script>
+
+  <h2>3. Итоги</h2>
+  <ul>
+    <li>Всё, что вы видите выше, работает <b>без API-ключа</b> и <b>без загрузки JS-библиотек</b>.</li>
+    <li>Для любой динамики — изменение центра, масштаба и типа — достаточно менять <code>iframe.src</code>.</li>
+    <li>Если потребуются клики, события, программное добавление меток и маршрутов — придётся использовать <b>JavaScript API Яндекс.Карт</b>.</li>
+  </ul>
+
+</body>
+</html>
