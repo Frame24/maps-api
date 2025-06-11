@@ -30,8 +30,28 @@
                 margin-bottom: 1em;
                 flex-wrap: wrap;
             }
-            .form-row label {
-                font-weight: bold;
+            .chip {
+                display: inline-flex;
+                align-items: center;
+                background: #f0f0f0;
+                border-radius: 16px;
+                padding: 4px 14px;
+                font-size: 1em;
+                font-weight: 500;
+                cursor: pointer;
+                border: 1px solid #e0e0e0;
+                transition:
+                    background 0.2s,
+                    border 0.2s;
+                user-select: none;
+            }
+            .chip input[type='checkbox'] {
+                accent-color: #1976d2;
+                margin-right: 6px;
+            }
+            .chip.selected {
+                background: #e3f0fd;
+                border: 1.5px solid #1976d2;
             }
             .form-row input[type='number'] {
                 width: 90px;
@@ -51,9 +71,6 @@
                 border-radius: 4px;
                 border: 1px solid #ccc;
             }
-            .form-row input[type='checkbox'] {
-                margin-right: 4px;
-            }
             .form-row button {
                 padding: 6px 18px;
                 border-radius: 4px;
@@ -67,10 +84,15 @@
             .form-row button:hover {
                 background: #1251a3;
             }
-            .styled-iframe.hover-anim {
-                transition:
-                    box-shadow 0.3s,
-                    border-radius 0.3s;
+            .iframe-wrapper {
+                display: inline-block;
+                box-sizing: border-box;
+            }
+            .iframe-wrapper iframe {
+                width: 100%;
+                height: 100%;
+                border: none;
+                display: block;
             }
         </style>
     </head>
@@ -81,10 +103,14 @@
             <b>Быстрый выбор:</b>
             <form id="cssForm" onsubmit="return false;">
                 <div class="form-row">
-                    <label><input type="checkbox" id="radius" checked />Скругление</label>
-                    <label><input type="checkbox" id="shadow" checked />Тень</label>
-                    <label>Ширина: <input type="number" id="width" value="70" />%</label>
-                    <label>Высота: <input type="number" id="height" value="400" />px</label>
+                    <label class="chip" id="chip-radius"
+                        ><input type="checkbox" id="radius" checked />Скругление</label
+                    >
+                    <label class="chip" id="chip-shadow"
+                        ><input type="checkbox" id="shadow" checked />Тень</label
+                    >
+                    <label>Ширина: <input type="number" id="width" value="500" />px</label>
+                    <label>Высота: <input type="number" id="height" value="300" />px</label>
                 </div>
                 <div class="form-row">
                     <label
@@ -107,7 +133,7 @@
                         </select>
                     </label>
                     <label>Margin: <input type="number" id="margin" value="0" />px</label>
-                    <label>Фон: <input type="color" id="bgColor" value="#ffffff" /></label>
+                    <label>Padding: <input type="number" id="padding" value="0" />px</label>
                 </div>
                 <div class="form-row">
                     <label
@@ -118,105 +144,108 @@
                             <option value="blur(2px)">blur</option>
                         </select>
                     </label>
-                    <label><input type="checkbox" id="hoverAnim" />Анимация наведения</label>
                     <button id="applyBtn">Показать</button>
                 </div>
             </form>
-            <iframe
-                id="mapFrame"
-                class="styled-iframe"
-                src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&z=10&l=map"
-            ></iframe>
-            <textarea id="codeEditor" class="editor" rows="12">
-&lt;iframe class="styled-iframe" src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&amp;z=10&amp;l=map"&gt;&lt;/iframe&gt;
+            <div id="wrapper" class="iframe-wrapper" style="width: 500px; height: 300px">
+                <iframe
+                    id="mapFrame"
+                    src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&z=10&l=map"
+                ></iframe>
+            </div>
+            <textarea id="codeEditor" class="editor" rows="14">
+&lt;div class="iframe-wrapper"&gt;
+  &lt;iframe src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&amp;z=10&amp;l=map"&gt;&lt;/iframe&gt;
+&lt;/div&gt;
 
-.styled-iframe {
-  width: 70%;
-  height: 400px;
+.iframe-wrapper {
+  width: 500px;
+  height: 300px;
   border-radius: 20px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.15);
   border: 1px solid #ccc;
   margin: 0;
-  background: #fff;
+  padding: 0;
   filter: none;
 }
-</textarea
+.iframe-wrapper iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}</textarea
             >
         </div>
         <script>
+            const wrapper = document.getElementById('wrapper');
             const frame = document.getElementById('mapFrame');
             const editor = document.getElementById('codeEditor');
             const form = document.getElementById('cssForm');
             const radius = document.getElementById('radius');
             const shadow = document.getElementById('shadow');
-            const width = document.getElementById('width');
-            const height = document.getElementById('height');
+            const chipRadius = document.getElementById('chip-radius');
+            const chipShadow = document.getElementById('chip-shadow');
+            const widthInput = document.getElementById('width');
+            const heightInput = document.getElementById('height');
             const borderColor = document.getElementById('borderColor');
             const borderWidth = document.getElementById('borderWidth');
             const borderStyle = document.getElementById('borderStyle');
             const margin = document.getElementById('margin');
-            const bgColor = document.getElementById('bgColor');
+            const padding = document.getElementById('padding');
             const filter = document.getElementById('filter');
-            const hoverAnim = document.getElementById('hoverAnim');
+            function updateChips() {
+                chipRadius.classList.toggle('selected', radius.checked);
+                chipShadow.classList.toggle('selected', shadow.checked);
+            }
             function updateCSSByForm() {
+                updateChips();
                 let style = '';
-                style += `width: ${width.value}%;\n`;
-                style += `height: ${height.value}px;\n`;
+                style += `width: ${widthInput.value}px;\n`;
+                style += `height: ${heightInput.value}px;\n`;
                 style += radius.checked ? 'border-radius: 20px;\n' : 'border-radius: 0;\n';
                 style += shadow.checked
                     ? 'box-shadow: 0 4px 24px rgba(0,0,0,0.15);\n'
                     : 'box-shadow: none;\n';
                 style += `border: ${borderWidth.value}px ${borderStyle.value} ${borderColor.value};\n`;
                 style += `margin: ${margin.value}px;\n`;
-                style += `background: ${bgColor.value};\n`;
+                style += `padding: ${padding.value}px;\n`;
                 style += `filter: ${filter.value};`;
-                frame.style.width = width.value + '%';
-                frame.style.height = height.value + 'px';
-                frame.style.borderRadius = radius.checked ? '20px' : '0';
-                frame.style.boxShadow = shadow.checked ? '0 4px 24px rgba(0,0,0,0.15)' : 'none';
-                frame.style.border = `${borderWidth.value}px ${borderStyle.value} ${borderColor.value}`;
-                frame.style.margin = margin.value + 'px';
-                frame.style.background = bgColor.value;
-                frame.style.filter = filter.value;
-                if (hoverAnim.checked) {
-                    frame.classList.add('hover-anim');
-                    frame.onmouseenter = () => {
-                        frame.style.boxShadow = '0 8px 32px rgba(0,0,0,0.25)';
-                        frame.style.borderRadius = '40px';
-                    };
-                    frame.onmouseleave = () => {
-                        frame.style.boxShadow = shadow.checked
-                            ? '0 4px 24px rgba(0,0,0,0.15)'
-                            : 'none';
-                        frame.style.borderRadius = radius.checked ? '20px' : '0';
-                    };
-                } else {
-                    frame.classList.remove('hover-anim');
-                    frame.onmouseenter = null;
-                    frame.onmouseleave = null;
-                }
-                editor.value = `<iframe class=\"styled-iframe\" src=\"https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&amp;z=10&amp;l=map\"></iframe>\n\n.styled-iframe {\n${style}\n}`;
+                wrapper.style.width = widthInput.value + 'px';
+                wrapper.style.height = heightInput.value + 'px';
+                wrapper.style.borderRadius = radius.checked ? '20px' : '0';
+                wrapper.style.boxShadow = shadow.checked ? '0 4px 24px rgba(0,0,0,0.15)' : 'none';
+                wrapper.style.border = `${borderWidth.value}px ${borderStyle.value} ${borderColor.value}`;
+                wrapper.style.margin = margin.value + 'px';
+                wrapper.style.padding = padding.value + 'px';
+                wrapper.style.filter = filter.value;
+                editor.value = `<div class=\"iframe-wrapper\">\n  <iframe src=\"https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&amp;z=10&amp;l=map\"></iframe>\n</div>\n\n.iframe-wrapper {\n${style}\n}\n.iframe-wrapper iframe {\n  width: 100%;\n  height: 100%;\n  border: none;\n}`;
             }
             form.addEventListener('submit', updateCSSByForm);
             [
                 radius,
                 shadow,
-                width,
-                height,
+                widthInput,
+                heightInput,
                 borderColor,
                 borderWidth,
                 borderStyle,
                 margin,
-                bgColor,
+                padding,
                 filter,
-                hoverAnim,
             ].forEach((input) => input.addEventListener('change', updateCSSByForm));
+            [chipRadius, chipShadow].forEach((chip) =>
+                chip.addEventListener('click', function (e) {
+                    const input = chip.querySelector('input[type="checkbox"]');
+                    input.checked = !input.checked;
+                    updateCSSByForm();
+                })
+            );
             editor.addEventListener('input', function () {
                 const match = editor.value.match(/src=\"([^\"]+)/);
                 if (match) {
                     frame.src = match[1].replace(/&amp;/g, '&');
                 }
             });
+            updateChips();
         </script>
     </body>
 </html>
