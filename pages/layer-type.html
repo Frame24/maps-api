@@ -3,74 +3,113 @@
     <head>
         <meta charset="UTF-8" />
         <title>Тип слоя карты</title>
+        <link rel="stylesheet" href="style.css" />
         <style>
-            body {
-                font-family: Arial, sans-serif;
-                background: #fafafa;
-                margin: 0;
-                padding: 30px;
+            .sticky-back {
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1000;
             }
-            h1 {
-                color: #333;
-            }
-            .example {
-                background: #fff;
-                border: 1px solid #ddd;
-                padding: 20px;
-                margin-bottom: 2em;
-            }
-            pre {
+            .editor {
+                width: 100%;
+                min-height: 60px;
+                font-family: Consolas, monospace;
+                font-size: 1em;
+                margin-top: 10px;
+                margin-bottom: 10px;
                 background: #f4f4f4;
-                padding: 10px;
-                overflow-x: auto;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                padding: 8px;
+                resize: vertical;
             }
-            a {
-                color: #1976d2;
+            .form-row {
+                display: flex;
+                gap: 1em;
+                margin-bottom: 1em;
+                flex-wrap: wrap;
+            }
+            .form-row label {
+                font-weight: bold;
+            }
+            .form-row select,
+            .form-row input[type='number'] {
+                width: 140px;
+                padding: 4px 8px;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+            }
+            .form-row button {
+                padding: 6px 18px;
+                border-radius: 4px;
+                border: none;
+                background: #1976d2;
+                color: #fff;
+                font-weight: bold;
+                cursor: pointer;
+                transition: background 0.2s;
+            }
+            .form-row button:hover {
+                background: #1251a3;
             }
         </style>
     </head>
     <body>
+        <a href="../index.html" class="sticky-back">← На главную</a>
         <h1>Выбор типа слоя карты</h1>
         <div class="example">
-            <b>Схема:</b>
+            <b>Быстрый выбор:</b>
+            <form id="layerForm" onsubmit="return false;">
+                <div class="form-row">
+                    <label
+                        >Тип слоя:
+                        <select id="layerType">
+                            <option value="map">Схема</option>
+                            <option value="sat">Спутник</option>
+                            <option value="sat,skl">Гибрид</option>
+                            <option value="trf">Пробки</option>
+                        </select>
+                    </label>
+                    <label
+                        >Масштаб:
+                        <input type="number" min="1" max="20" id="zoom" value="10" />
+                    </label>
+                    <button id="applyBtn">Показать</button>
+                </div>
+            </form>
             <iframe
+                id="mapFrame"
                 src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&z=10&l=map"
                 width="80%"
                 height="300"
                 frameborder="0"
             ></iframe>
-            <pre><code>&lt;iframe src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&amp;z=10&amp;l=map" width="80%" height="300"&gt;&lt;/iframe&gt;</code></pre>
+            <textarea id="codeEditor" class="editor" rows="2">
+&lt;iframe src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&amp;z=10&amp;l=map" width="80%" height="300"&gt;&lt;/iframe&gt;</textarea
+            >
         </div>
-        <div class="example">
-            <b>Спутник:</b>
-            <iframe
-                src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&z=12&l=sat"
-                width="80%"
-                height="300"
-                frameborder="0"
-            ></iframe>
-            <pre><code>&lt;iframe src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&amp;z=12&amp;l=sat" width="80%" height="300"&gt;&lt;/iframe&gt;</code></pre>
-        </div>
-        <div class="example">
-            <b>Гибрид:</b>
-            <iframe
-                src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&z=12&l=sat,skl"
-                width="80%"
-                height="300"
-                frameborder="0"
-            ></iframe>
-            <pre><code>&lt;iframe src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&amp;z=12&amp;l=sat,skl" width="80%" height="300"&gt;&lt;/iframe&gt;</code></pre>
-        </div>
-        <div class="example">
-            <b>Пробки:</b>
-            <iframe
-                src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&z=12&l=trf"
-                width="80%"
-                height="300"
-                frameborder="0"
-            ></iframe>
-            <pre><code>&lt;iframe src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&amp;z=12&amp;l=trf" width="80%" height="300"&gt;&lt;/iframe&gt;</code></pre>
-        </div>
-        <a href="../index.html">← На главную</a>
+        <script>
+            const frame = document.getElementById('mapFrame');
+            const editor = document.getElementById('codeEditor');
+            const form = document.getElementById('layerForm');
+            const layerType = document.getElementById('layerType');
+            const zoom = document.getElementById('zoom');
+            function updateMapByForm() {
+                const l = layerType.value;
+                const z = zoom.value.trim();
+                const src = `https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&z=${z}&l=${l}`;
+                frame.src = src;
+                editor.value = `<iframe src="${src.replace(/&/g, '&amp;')}" width="80%" height="300"></iframe>`;
+            }
+            form.addEventListener('submit', updateMapByForm);
+            [layerType, zoom].forEach((input) => input.addEventListener('change', updateMapByForm));
+            editor.addEventListener('input', function () {
+                const match = editor.value.match(/src=\"([^\"]+)/);
+                if (match) {
+                    frame.src = match[1].replace(/&amp;/g, '&');
+                }
+            });
+        </script>
     </body>
 </html>

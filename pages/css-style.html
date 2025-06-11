@@ -3,48 +3,81 @@
     <head>
         <meta charset="UTF-8" />
         <title>Стилизация iframe через CSS</title>
+        <link rel="stylesheet" href="style.css" />
         <style>
-            body {
-                font-family: Arial, sans-serif;
-                background: #fafafa;
-                margin: 0;
-                padding: 30px;
+            .sticky-back {
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1000;
             }
-            h1 {
-                color: #333;
-            }
-            .example {
-                background: #fff;
-                border: 1px solid #ddd;
-                padding: 20px;
-                margin-bottom: 2em;
-            }
-            .styled-iframe {
-                width: 70%;
-                height: 400px;
-                border-radius: 20px;
-                box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
-                border: none;
-            }
-            pre {
+            .editor {
+                width: 100%;
+                min-height: 60px;
+                font-family: Consolas, monospace;
+                font-size: 1em;
+                margin-top: 10px;
+                margin-bottom: 10px;
                 background: #f4f4f4;
-                padding: 10px;
-                overflow-x: auto;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                padding: 8px;
+                resize: vertical;
             }
-            a {
-                color: #1976d2;
+            .form-row {
+                display: flex;
+                gap: 1em;
+                margin-bottom: 1em;
+                flex-wrap: wrap;
+            }
+            .form-row label {
+                font-weight: bold;
+            }
+            .form-row input[type='number'] {
+                width: 90px;
+                padding: 4px 8px;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+            }
+            .form-row input[type='checkbox'] {
+                margin-right: 4px;
+            }
+            .form-row button {
+                padding: 6px 18px;
+                border-radius: 4px;
+                border: none;
+                background: #1976d2;
+                color: #fff;
+                font-weight: bold;
+                cursor: pointer;
+                transition: background 0.2s;
+            }
+            .form-row button:hover {
+                background: #1251a3;
             }
         </style>
     </head>
     <body>
+        <a href="../index.html" class="sticky-back">← На главную</a>
         <h1>Стилизация контейнера &lt;iframe&gt; через CSS</h1>
         <div class="example">
-            <b>Пример:</b>
+            <b>Быстрый выбор:</b>
+            <form id="cssForm" onsubmit="return false;">
+                <div class="form-row">
+                    <label><input type="checkbox" id="radius" checked />Скругление</label>
+                    <label><input type="checkbox" id="shadow" checked />Тень</label>
+                    <label>Ширина: <input type="number" id="width" value="70" />%</label>
+                    <label>Высота: <input type="number" id="height" value="400" />px</label>
+                    <button id="applyBtn">Показать</button>
+                </div>
+            </form>
             <iframe
+                id="mapFrame"
                 class="styled-iframe"
                 src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&z=10&l=map"
             ></iframe>
-            <pre><code>&lt;iframe class="styled-iframe" src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&amp;z=10&amp;l=map"&gt;&lt;/iframe&gt;
+            <textarea id="codeEditor" class="editor" rows="7">
+&lt;iframe class="styled-iframe" src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&amp;z=10&amp;l=map"&gt;&lt;/iframe&gt;
 
 .styled-iframe {
   width: 70%;
@@ -52,8 +85,41 @@
   border-radius: 20px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.15);
   border: none;
-}</code></pre>
+}</textarea
+            >
         </div>
-        <a href="../index.html">← На главную</a>
+        <script>
+            const frame = document.getElementById('mapFrame');
+            const editor = document.getElementById('codeEditor');
+            const form = document.getElementById('cssForm');
+            const radius = document.getElementById('radius');
+            const shadow = document.getElementById('shadow');
+            const width = document.getElementById('width');
+            const height = document.getElementById('height');
+            function updateCSSByForm() {
+                let style = '';
+                style += `width: ${width.value}%;\n`;
+                style += `height: ${height.value}px;\n`;
+                style += radius.checked ? 'border-radius: 20px;\n' : '';
+                style += shadow.checked ? 'box-shadow: 0 4px 24px rgba(0,0,0,0.15);\n' : '';
+                style += 'border: none;';
+                frame.style.width = width.value + '%';
+                frame.style.height = height.value + 'px';
+                frame.style.borderRadius = radius.checked ? '20px' : '0';
+                frame.style.boxShadow = shadow.checked ? '0 4px 24px rgba(0,0,0,0.15)' : 'none';
+                frame.style.border = 'none';
+                editor.value = `<iframe class="styled-iframe" src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&amp;z=10&amp;l=map"></iframe>\n\n.styled-iframe {\n${style}\n}`;
+            }
+            form.addEventListener('submit', updateCSSByForm);
+            [radius, shadow, width, height].forEach((input) =>
+                input.addEventListener('change', updateCSSByForm)
+            );
+            editor.addEventListener('input', function () {
+                const match = editor.value.match(/src=\"([^\"]+)/);
+                if (match) {
+                    frame.src = match[1].replace(/&amp;/g, '&');
+                }
+            });
+        </script>
     </body>
 </html>
