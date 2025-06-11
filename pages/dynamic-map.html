@@ -63,6 +63,27 @@
     <body>
         <a href="../index.html" class="sticky-back">← На главную</a>
         <h1>Динамическое изменение карты (JS без API)</h1>
+        <div
+            class="note"
+            style="
+                background: #e3f2fd;
+                border: 2px solid #1976d2;
+                padding: 18px 22px;
+                margin-bottom: 1.5em;
+                font-size: 1.25em;
+                display: flex;
+                align-items: center;
+                gap: 1em;
+                box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
+                border-radius: 12px;
+            "
+        >
+            <span style="font-size: 2em">🛠️</span>
+            <span
+                ><b>Меняйте координаты, масштаб и тип слоя — карта обновится мгновенно!</b><br />Это
+                работает без API, только через изменение <code>iframe.src</code>.</span
+            >
+        </div>
         <div class="example">
             <b>Быстрый выбор:</b>
             <form id="dynForm" onsubmit="return false;">
