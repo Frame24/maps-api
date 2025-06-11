@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Стилизация iframe через CSS</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background: #fafafa;
+                margin: 0;
+                padding: 30px;
+            }
+            h1 {
+                color: #333;
+            }
+            .example {
+                background: #fff;
+                border: 1px solid #ddd;
+                padding: 20px;
+                margin-bottom: 2em;
+            }
+            .styled-iframe {
+                width: 70%;
+                height: 400px;
+                border-radius: 20px;
+                box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+                border: none;
+            }
+            pre {
+                background: #f4f4f4;
+                padding: 10px;
+                overflow-x: auto;
+            }
+            a {
+                color: #1976d2;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Стилизация контейнера &lt;iframe&gt; через CSS</h1>
+        <div class="example">
+            <b>Пример:</b>
+            <iframe
+                class="styled-iframe"
+                src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&z=10&l=map"
+            ></iframe>
+            <pre><code>&lt;iframe class="styled-iframe" src="https://yandex.ru/map-widget/v1/?ll=37.617600%2C55.755800&amp;z=10&amp;l=map"&gt;&lt;/iframe&gt;
+
+.styled-iframe {
+  width: 70%;
+  height: 400px;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+  border: none;
+}</code></pre>
+        </div>
+        <a href="../index.html">← На главную</a>
+    </body>
+</html>
