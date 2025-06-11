@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Subway в Екатеринбурге — пример поиска через iframe</title>
+        <link rel="stylesheet" href="style.css" />
+        <style>
+            .sticky-back {
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1000;
+            }
+        </style>
+    </head>
+    <body>
+        <a href="../index.html" class="sticky-back">← На главную</a>
+        <h1>Subway в Екатеринбурге (пример поиска через iframe)</h1>
+        <div class="example">
+            <b>Виджет поиска Subway в Екатеринбурге:</b>
+            <div style="margin-top: 1em">
+                <div style="position: relative; overflow: hidden; max-width: 100%">
+                    <a
+                        href="https://yandex.ru/maps/54/yekaterinburg/search/Subway/?utm_medium=mapframe&utm_source=maps"
+                        style="color: #eee; font-size: 12px; position: absolute; top: 0px"
+                        >Subway в Екатеринбурге</a
+                    >
+                    <a
+                        href="https://yandex.ru/maps/54/yekaterinburg/?utm_medium=mapframe&utm_source=maps"
+                        style="color: #eee; font-size: 12px; position: absolute; top: 14px"
+                        >Екатеринбург</a
+                    >
+                    <iframe
+                        src="https://yandex.ru/map-widget/v1/?display-text=Subway&ll=60.609178%2C56.850685&mode=search&sll=60.690500%2C56.850685&sspn=0.429443%2C0.192920&text=%7B%22text%22%3A%22Subway%22%2C%22what%22%3A%5B%7B%22attr_name%22%3A%22chain_id%22%2C%22attr_values%22%3A%5B%22805295318%22%5D%7D%5D%7D&z=11.7"
+                        width="80%"
+                        height="600"
+                        frameborder="1"
+                        allowfullscreen="true"
+                        style="position: relative"
+                    ></iframe>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
