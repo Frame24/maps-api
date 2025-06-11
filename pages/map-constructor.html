@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Произвольные точки и маршруты через Map Constructor</title>
+        <link rel="stylesheet" href="style.css" />
+        <style>
+            .sticky-back {
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1000;
+            }
+            .editor {
+                width: 100%;
+                min-height: 60px;
+                font-family: Consolas, monospace;
+                font-size: 1em;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                background: #f4f4f4;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                padding: 8px;
+                resize: vertical;
+            }
+            .form-row {
+                display: flex;
+                gap: 1em;
+                margin-bottom: 1em;
+                flex-wrap: wrap;
+            }
+            .form-row label {
+                font-weight: bold;
+            }
+            .form-row input[type='text'] {
+                width: 420px;
+                padding: 4px 8px;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+            }
+            .form-row button {
+                padding: 6px 18px;
+                border-radius: 4px;
+                border: none;
+                background: #1976d2;
+                color: #fff;
+                font-weight: bold;
+                cursor: pointer;
+                transition: background 0.2s;
+            }
+            .form-row button:hover {
+                background: #1251a3;
+            }
+        </style>
+    </head>
+    <body>
+        <a href="../index.html" class="sticky-back">← На главную</a>
+        <h1>Произвольные точки и маршруты через Map Constructor</h1>
+        <div class="example">
+            <b>Быстрый выбор:</b>
+            <form id="constructorForm" onsubmit="return false;">
+                <div class="form-row">
+                    <label
+                        >ID карты (constructor):
+                        <input
+                            type="text"
+                            id="constructorId"
+                            value="746b8337d2fb5b9a7edbd933bbae882f5deb21cea83b1efa9523ef0b0c395ea2"
+                        />
+                    </label>
+                    <button id="applyBtn">Показать</button>
+                </div>
+            </form>
+            <iframe
+                id="mapFrame"
+                src="https://yandex.ru/map-widget/v1/?um=constructor%3A746b8337d2fb5b9a7edbd933bbae882f5deb21cea83b1efa9523ef0b0c395ea2&source=constructor"
+                width="80%"
+                height="500"
+                frameborder="0"
+            ></iframe>
+            <textarea id="codeEditor" class="editor" rows="2">
+&lt;iframe src="https://yandex.ru/map-widget/v1/?um=constructor%3A746b8337d2fb5b9a7edbd933bbae882f5deb21cea83b1efa9523ef0b0c395ea2&amp;source=constructor" width="80%" height="500"&gt;&lt;/iframe&gt;</textarea
+            >
+            <div style="color: #555; font-size: 0.95em; margin-top: 0.5em">
+                Как получить ID:
+                <a href="https://yandex.ru/map-constructor" target="_blank">Конструктор карт</a> →
+                "Поделиться" → "Встраивание на сайт" → скопируйте ID из кода.
+            </div>
+        </div>
+        <script>
+            const frame = document.getElementById('mapFrame');
+            const editor = document.getElementById('codeEditor');
+            const form = document.getElementById('constructorForm');
+            const constructorId = document.getElementById('constructorId');
+            function updateMapByForm() {
+                const id = constructorId.value.trim();
+                const src = `https://yandex.ru/map-widget/v1/?um=constructor%3A${id}&source=constructor`;
+                frame.src = src;
+                editor.value = `<iframe src="${src.replace(/&/g, '&amp;')}" width="80%" height="500"></iframe>`;
+            }
+            form.addEventListener('submit', updateMapByForm);
+            constructorId.addEventListener('input', updateMapByForm);
+            editor.addEventListener('input', function () {
+                const match = editor.value.match(/src=\"([^\"]+)/);
+                if (match) {
+                    frame.src = match[1].replace(/&amp;/g, '&');
+                }
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Динамическое изменение карты (JS без API)</title>
+        <link rel="stylesheet" href="style.css" />
+        <style>
+            .sticky-back {
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1000;
+            }
+            .editor {
+                width: 100%;
+                min-height: 60px;
+                font-family: Consolas, monospace;
+                font-size: 1em;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                background: #f4f4f4;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                padding: 8px;
+                resize: vertical;
+            }
+            .form-row {
+                display: flex;
+                gap: 1em;
+                margin-bottom: 1em;
+                flex-wrap: wrap;
+            }
+            .form-row label {
+                font-weight: bold;
+            }
+            .form-row input[type='number'],
+            .form-row input[type='text'] {
+                width: 120px;
+                padding: 4px 8px;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+            }
+            .form-row select {
+                padding: 4px 8px;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+            }
+            .form-row button {
+                padding: 6px 18px;
+                border-radius: 4px;
+                border: none;
+                background: #1976d2;
+                color: #fff;
+                font-weight: bold;
+                cursor: pointer;
+                transition: background 0.2s;
+            }
+            .form-row button:hover {
+                background: #1251a3;
+            }
+        </style>
+    </head>
+    <body>
+        <a href="../index.html" class="sticky-back">← На главную</a>
+        <h1>Динамическое изменение карты (JS без API)</h1>
+        <div class="example">
+            <b>Быстрый выбор:</b>
+            <form id="dynForm" onsubmit="return false;">
+                <div class="form-row">
+                    <label
+                        >Центр (lat,lon): <input id="center" value="58.047597, 38.844779"
+                    /></label>
+                    <label>Масштаб: <input id="zoom" type="number" value="10" /></label>
+                    <label
+                        >Тип:
+                        <select id="layer">
+                            <option value="map">Схема</option>
+                            <option value="sat">Спутник</option>
+                            <option value="sat,skl">Гибрид</option>
+                        </select>
+                    </label>
+                    <button id="applyBtn">Обновить карту</button>
+                </div>
+            </form>
+            <iframe id="dynFrame" width="80%" height="500" frameborder="0"></iframe>
+            <textarea id="codeEditor" class="editor" rows="2">
+&lt;iframe src="https://yandex.ru/map-widget/v1/?ll=38.844779%2C58.047597&amp;z=10&amp;l=map" width="80%" height="500"&gt;&lt;/iframe&gt;</textarea
+            >
+        </div>
+        <script>
+            const frame = document.getElementById('dynFrame');
+            const editor = document.getElementById('codeEditor');
+            const form = document.getElementById('dynForm');
+            const center = document.getElementById('center');
+            const zoom = document.getElementById('zoom');
+            const layer = document.getElementById('layer');
+            function updateMapByForm() {
+                const [lat, lon] = center.value.split(',').map((s) => s.trim());
+                const z = zoom.value;
+                const l = layer.value;
+                const src = `https://yandex.ru/map-widget/v1/?ll=${lon}%2C${lat}&z=${z}&l=${l}`;
+                frame.src = src;
+                editor.value = `<iframe src="${src.replace(/&/g, '&amp;')}" width="80%" height="500"></iframe>`;
+            }
+            form.addEventListener('submit', updateMapByForm);
+            [center, zoom, layer].forEach((input) =>
+                input.addEventListener('change', updateMapByForm)
+            );
+            editor.addEventListener('input', function () {
+                const match = editor.value.match(/src=\"([^\"]+)/);
+                if (match) {
+                    frame.src = match[1].replace(/&amp;/g, '&');
+                }
+            });
+            // Инициализация
+            updateMapByForm();
+        </script>
+    </body>
+</html>
